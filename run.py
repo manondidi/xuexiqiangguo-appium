@@ -18,12 +18,12 @@ desire_caps = {
 
 
 def random_sleep():
-    time = random.randint(5, 8) + random.random()
+    time = random.randint(2, 3) + random.random()
     sleep(time)
 
 
 def get_random_read_distance():
-    return random.randint(500, 1000)
+    return random.randint(int(SCREEN_HEIGHT / 5), int(SCREEN_HEIGHT / 4))
 
 
 def prepare():
@@ -34,27 +34,31 @@ def prepare():
     sleep(10)
 
 
-def start_learn_article(count):
+def start_learn_article(count, target_count):
+    if count == 0:
+        return
     tap_learn_tab()
-    for i in range(count):
-        read_aricle(i)
+    for i in range(target_count):
+        read_aricle(i, count, target_count)
 
 
-def start_learn_video(count):
+def start_learn_video(count, target_count):
+    if count == 0:
+        return
     tap_video_tab()
     tap_video_tab()
-    for i in range(count):
-        watch_video(i)
+    for i in range(target_count):
+        watch_video(i, count, target_count)
 
 
 def scroll_recyclerview(distance):
-    driver.swipe(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + distance, SCREEN_WIDTH / 2,
-                 SCREEN_HEIGHT / 2, 5000)
+    driver.swipe(int(SCREEN_WIDTH / 2), int(SCREEN_HEIGHT / 2 + distance), int(SCREEN_WIDTH / 2),
+                 int(SCREEN_HEIGHT / 2), 3000)
     random_sleep()
 
 
 def tap_recyclerview_first_item():
-    driver.tap([(SCREEN_WIDTH / 2, 350)], 500)  # 点击列表中的第一个item
+    driver.tap([(SCREEN_WIDTH / 2, 300)], 1000)  # 点击列表中的第一个item
     random_sleep()
 
 
@@ -64,11 +68,11 @@ def tap_learn_tab():
 
 
 def tap_video_tab():
-    driver.find_element_by_id('cn.xuexi.android: id / home_bottom_tab_button_contact').click()
+    driver.find_element_by_id('cn.xuexi.android:id/home_bottom_tab_button_contact').click()
     random_sleep()
 
 
-def read_aricle(i):
+def read_aricle(i, count, target_count):
     random_sleep()
     if i == 0:
         scroll_recyclerview(820)  # 调过banner
@@ -82,33 +86,36 @@ def read_aricle(i):
     else:
         scroll_recyclerview(230)
     tap_recyclerview_first_item()
-    for i in range(12):
-        distance = get_random_read_distance()
-        if i > 6:
-            distance = -distance
-        scroll_recyclerview(distance)  # 模拟滚动屏幕看文章
-        time = random.randint(10, 15)
-        sleep(time)
     random_sleep()
+    if target_count - count <= i < target_count:
+        for i in range(24):
+            distance = get_random_read_distance()
+            if i > 12:
+                distance = -distance
+            scroll_recyclerview(distance)  # 模拟滚动屏幕看文章
+            time = random.randint(5, 7)
+            sleep(time)
+
     # collect(i)
     # share(i)
     driver.back()
     random_sleep()
 
 
-def watch_video(i):
+def watch_video(i, count, target_count):
     random_sleep()
     if i == 0:
         pass
     else:
         scroll_recyclerview(810)
+    random_sleep()
     tap_recyclerview_first_item()
     random_sleep()
-    for i in range(4):
-        tap_video_reply()
-        sleep(50)
-
-    random_sleep()
+    if target_count - count <= i < target_count:
+        for i in range(4):
+            tap_video_reply()
+            sleep(50)
+        random_sleep()
     driver.back()
     random_sleep()
 
@@ -122,9 +129,9 @@ def main():
     prepare()
     FULL_SCREEN_BAR_HEIGHT = 0  # 全面屏
     # 学习文章
-    start_learn_article(6)
+    # start_learn_article(5, 6)
     # 学习视频
-    # start_learn_video(6)
+    start_learn_video(6, 6)
 
 
 if __name__ == '__main__':
